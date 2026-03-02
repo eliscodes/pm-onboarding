@@ -330,50 +330,49 @@ const data = [
   {
     phase: "01", title: "Zugänge & Systeme",
     items: [
-      { label: "PIM-System Zugang einrichten", desc: "Login, Rolle, Berechtigungen klären — welche Channels, Mandanten, Sprachen?", badge: "pm" },
-      { label: "MDM-System Zugang", desc: "Stammdatenverwaltung: Zugang zu Kernsystem, ggf. Staging-Umgebung", badge: "pm" },
-      { label: "Ticket-System & Boards", desc: "Jira, Azure DevOps o.ä. — welche Boards sind relevant?", badge: "pm" },
+      { label: "PIM-System Zugang einrichten", desc: "Login, Rolle, Berechtigungen klären — welche Mandanten, Sprachen?", badge: "pm" },
+      { label: "MS-Teams Zugang", desc: "MS Teams Channels aussuchen und hinzufügen", badge: "pm" },
+      { label: "Jira / Ticket-System und Boards", desc: "Jira, Confluence. PIMpossible Board", badge: "pm" },
       { label: "Confluence / Dokumentation", desc: "Wo lebt das Wissen? Seiten bookmarken, Spaces erkunden.", badge: "pm" },
-      { label: "Staging / Test-Umgebung", desc: "Zugang zu nicht-produktiven Umgebungen sicherstellen", badge: "tech" },
+      { label: "Test-Umgebung", desc: "Zugang zu nicht-produktiven Umgebungen sicherstellen", badge: "tech" },
     ]
   },
   {
     phase: "02", title: "Systemarchitektur verstehen",
     items: [
       { label: "Systemlandschaft aufnehmen", desc: "Welche Systeme sprechen mit dem PIM? ERP, Webshop, DAM, Marketplace?", badge: "tech" },
-      { label: "Datenflusskarte anfordern", desc: "Gibt es eine aktuelle Übersicht der Schnittstellen & Datenflüsse?", badge: "tech" },
+      { label: "Datenfluss Process Chart", desc: "Gibt es eine aktuelle Übersicht der Schnittstellen & Datenflüsse?", badge: "tech" },
       { label: "Datenmodell verstehen", desc: "Attribute, Produkthierarchien, Kategorien, Variantenmodell", badge: "tech" },
-      { label: "Export-Kanäle dokumentieren", desc: "Wo werden Daten raus gespielt? Shop, Print, Marktplätze, APIs?", badge: "tech" },
-      { label: "Import-Quellen dokumentieren", desc: "Wer liefert Daten ins PIM? Lieferanten, ERP, manuell?", badge: "tech" },
+      { label: "Export-Kanäle dokumentieren", desc: "Wo werden Daten exportiert? Shop, Marktplätze, ERP?", badge: "tech" },
+      { label: "Import-Quellen dokumentieren", desc: "Wer liefert Daten ins PIM? Lieferanten, ERP, SFTP Files, manuell?", badge: "tech" },
     ]
   },
   {
     phase: "03", title: "Prozesse & Workflows",
     items: [
-      { label: "Pflegeprozess für Produktdaten", desc: "Wer pflegt was? Content Team, Supplier Portal, automatisch?", badge: "pm" },
+      { label: "Pflegeprozess für Produktdaten", desc: "Wer pflegt was? Content Team, Automatisierte Prozesse?", badge: "pm" },
       { label: "Release-Prozess kennenlernen", desc: "Wie kommen Änderungen ins PIM? Deployment-Zyklus, Change Freeze?", badge: "pm" },
       { label: "Qualitätssicherung (DQM)", desc: "Gibt es Validierungsregeln, Completeness Scores, Data Quality Reports?", badge: "tech" },
       { label: "Approval Workflows", desc: "Wer muss neue Attribute, Strukturen oder Änderungen freigeben?", badge: "stakeholder" },
-      { label: "Eskalationswege kennen", desc: "Bei Systemausfällen, Datenfehlern — wen rufe ich an?", badge: "pm" },
+      { label: "Eskalationswege kennen", desc: "Bei Systemausfällen, Datenfehlern: Wen kontaktieren ich?", badge: "pm" },
     ]
   },
   {
     phase: "04", title: "Stakeholder & Team",
     items: [
-      { label: "Stakeholder-Map erstellen", desc: "IT, Business, Einkauf, Marketing, externe Partner — wer ist involviert?", badge: "stakeholder" },
+      { label: "Stakeholder-Map erstellen", desc: "IT, Business, externe Partner — wer ist involviert?", badge: "stakeholder" },
       { label: "Key Contacts pro System", desc: "Technischer Ansprechpartner für PIM, ERP, Shop, DAM", badge: "stakeholder" },
-      { label: "Regeltermine kennen", desc: "Welche Sync-Meetings, Sprints, Reviews gibt es?", badge: "pm" },
-      { label: "Schnittstellen zu anderen PMs", desc: "Category Management, IT-PM, Marktplatz-PM — wer entscheidet was?", badge: "stakeholder" },
+      { label: "Regeltermine kennen", desc: "Welche Mettings: Jour-Fixe, Plannings, Refinements gibt es?", badge: "pm" },
+      { label: "Schnittstellen zu anderen PMs", desc: "Wer entscheidet was?", badge: "stakeholder" },
     ]
   },
   {
     phase: "05", title: "Erste eigene Deliverables",
     items: [
-      { label: "Systemdoku aktualisieren / anlegen", desc: "Fehlende Dokumentation identifizieren und erste Version erstellen", badge: "pm" },
+      { label: "Systemdoku aktualisieren / anlegen", desc: "Fehlende Dokumentation identifizieren und erste Version erstellen oder Bestehende erweitern", badge: "pm" },
       { label: "Attribut-Mapping dokumentieren", desc: "Quellfeld → PIM-Feld → Ausgabefeld für mind. einen Produkttyp", badge: "tech" },
-      { label: "Backlog-Grooming Erstteilnahme", desc: "Tickets verstehen, Fragen stellen, erste eigene Stories schreiben", badge: "pm" },
-      { label: "KPI-Report verstehen", desc: "Welche Datenqualitäts-KPIs werden gemessen? Wer schaut drauf?", badge: "pm" },
-      { label: "30-60-90 Tage Plan aufsetzen", desc: "Eigene Ziele definieren und mit Führungskraft abstimmen", badge: "pm" },
+      { label: "Backlog-Grooming Erstteilnahme", desc: "Tickets verstehen, Fragen stellen, erste eigene Tickets schreiben", badge: "pm" },
+      { label: "30-60-90 Tage Plan aufsetzen", desc: "Eigene Ziele definieren und mit Führungskraft/People Coach abstimmen", badge: "pm" },
     ]
   }
 ];
