@@ -7,7 +7,7 @@ Eine interaktive, minimalistische Onboarding-Checkliste für PMs im E-Commerce U
 
 ---
 
-## ✨ Features
+## Features
 
 -  Interaktive Checkboxen mit Fortschrittsanzeige  
 -  Persistenz via `localStorage` (Fortschritt bleibt gespeichert)  
@@ -19,7 +19,7 @@ Eine interaktive, minimalistische Onboarding-Checkliste für PMs im E-Commerce U
 
 ---
 
-## 🚀 Nutzung
+## Nutzung
 
 1. Repository klonen oder Datei herunterladen  
 2. `index.html` im Browser öffnen  
