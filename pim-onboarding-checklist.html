@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIM Onboarding Checklist</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
     --bg: #0e0f11;
@@ -16,294 +18,70 @@
     --muted: #6b7280;
     --done-bg: #0d2a1f;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    padding: 40px 20px 80px;
-  }
-
-  .noise {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
-
-  .container {
-    max-width: 760px;
-    margin: 0 auto;
-    position: relative; z-index: 1;
-  }
-
-  header {
-    margin-bottom: 48px;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .tag {
-    display: inline-block;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 3px 10px;
-    border-radius: 2px;
-    margin-bottom: 16px;
-  }
-
-  h1 {
-    font-size: clamp(28px, 5vw, 46px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: 10px;
-  }
-
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; padding: 40px 20px 80px; }
+  .noise { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); opacity: 0.4; }
+  .container { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+  header { margin-bottom: 48px; animation: fadeUp 0.6s ease both; }
+  .tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); padding: 3px 10px; border-radius: 2px; margin-bottom: 16px; }
+  h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 10px; }
   h1 span { color: var(--accent); }
-
-  .subtitle {
-    color: var(--muted);
-    font-size: 15px;
-    font-weight: 400;
-    max-width: 480px;
-    line-height: 1.6;
-  }
-
-  .progress-bar-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    height: 6px;
-    margin: 32px 0 8px;
-    overflow: hidden;
-  }
-
-  .progress-bar {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 4px;
-    transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    width: 0%;
-  }
-
-  .progress-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-  }
-
+  .subtitle { color: var(--muted); font-size: 15px; font-weight: 400; max-width: 480px; line-height: 1.6; }
+  .progress-bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; height: 6px; margin: 32px 0 8px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); width: 0%; }
+  .progress-label { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 40px; }
   .progress-label .pct { color: var(--accent); font-weight: 500; }
-
-  .phase {
-    margin-bottom: 40px;
-    animation: fadeUp 0.5s ease both;
-  }
-
+  .phase { margin-bottom: 40px; animation: fadeUp 0.5s ease both; }
   .phase:nth-child(1) { animation-delay: 0.1s; }
   .phase:nth-child(2) { animation-delay: 0.2s; }
   .phase:nth-child(3) { animation-delay: 0.3s; }
   .phase:nth-child(4) { animation-delay: 0.4s; }
   .phase:nth-child(5) { animation-delay: 0.5s; }
-
-  .phase-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .phase-number {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--accent2);
-    min-width: 28px;
-  }
-
-  .phase-title {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text);
-    flex: 1;
-  }
-
-  .phase-count {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    padding: 2px 8px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    transition: all 0.3s;
-  }
-
+  .phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; cursor: pointer; user-select: none; }
+  .phase-number { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); min-width: 28px; }
+  .phase-title { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); flex: 1; }
+  .phase-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); padding: 2px 8px; border: 1px solid var(--border); border-radius: 20px; transition: all 0.3s; }
   .phase-count.done { border-color: var(--accent); color: var(--accent); }
-
-  .phase-toggle {
-    color: var(--muted);
-    font-size: 16px;
-    transition: transform 0.3s;
-  }
-
+  .phase-toggle { color: var(--muted); font-size: 16px; transition: transform 0.3s; }
   .phase.collapsed .phase-toggle { transform: rotate(-90deg); }
   .phase.collapsed .items { display: none; }
-
   .items { display: flex; flex-direction: column; gap: 2px; }
-
-  .item {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 13px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .item::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: transparent;
-    transition: background 0.3s;
-  }
-
+  .item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; }
+  .item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; transition: background 0.3s; }
   .item:hover { border-color: #3a3d44; background: #1c1e23; }
   .item:hover::before { background: var(--accent2); }
-
-  .item.checked {
-    background: var(--done-bg);
-    border-color: #1a4a35;
-  }
-
+  .item.checked { background: var(--done-bg); border-color: #1a4a35; }
   .item.checked::before { background: var(--accent); }
-
-  .checkbox {
-    width: 18px; height: 18px;
-    border: 2px solid var(--border);
-    border-radius: 3px;
-    flex-shrink: 0;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.25s;
-    font-size: 10px;
-    color: transparent;
-  }
-
-  .item.checked .checkbox {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--bg);
-  }
-
+  .checkbox { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 3px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.25s; font-size: 10px; color: transparent; }
+  .item.checked .checkbox { background: var(--accent); border-color: var(--accent); color: var(--bg); }
   .item-text { flex: 1; }
-
-  .item-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.4;
-    transition: color 0.25s;
-  }
-
-  .item.checked .item-label {
-    color: var(--muted);
-    text-decoration: line-through;
-    text-decoration-color: #2a4a3a;
-  }
-
-  .item-desc {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 3px;
-    font-weight: 400;
-    line-height: 1.5;
-  }
-
-  .badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
+  .item-label { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; transition: color 0.25s; }
+  .item.checked .item-label { color: var(--muted); text-decoration: line-through; text-decoration-color: #2a4a3a; }
+  .item-desc { font-size: 12px; color: var(--muted); margin-top: 3px; font-weight: 400; line-height: 1.5; }
+  .badge { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 2px; flex-shrink: 0; margin-top: 2px; }
   .badge.pm { background: #1e2a4a; color: #7ba7f5; border: 1px solid #2a3a6a; }
   .badge.tech { background: #2a1e0e; color: #f5a030; border: 1px solid #4a3a1a; }
   .badge.stakeholder { background: #2a1a2a; color: #c570e8; border: 1px solid #4a2a5a; }
-
-  .confetti-msg {
-    display: none;
-    text-align: center;
-    padding: 32px;
-    background: var(--done-bg);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    margin-top: 40px;
-    animation: fadeUp 0.5s ease both;
-  }
-
+  .confetti-msg { display: none; text-align: center; padding: 32px; background: var(--done-bg); border: 1px solid var(--accent); border-radius: 8px; margin-top: 40px; animation: fadeUp 0.5s ease both; }
   .confetti-msg h2 { color: var(--accent); font-size: 22px; margin-bottom: 8px; }
   .confetti-msg p { color: var(--muted); font-size: 14px; }
-
-  .reset-btn {
-    display: block;
-    margin: 32px auto 0;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 8px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
+  .bottom-bar { display: flex; align-items: center; gap: 8px; margin-top: 40px; flex-wrap: wrap; }
+  .export-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .export-btn.pdf:hover { border-color: #f55; color: #f55; }
+  .export-btn.csv:hover { border-color: #7ba7f5; color: #7ba7f5; }
+  .reset-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: all 0.2s; margin-left: auto; }
   .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pop {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.12); }
-    100% { transform: scale(1); }
-  }
-
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
   .item.pop { animation: pop 0.3s ease; }
 </style>
 </head>
 <body>
 <div class="noise"></div>
 <div class="container">
-
   <header>
-    <div class="tag">v1.0 · PIM/MDM</div>
+    <div class="tag">v1.1 · PIM/MDM</div>
     <h1>Onboarding<br><span>Checklist</span></h1>
     <p class="subtitle">Für Technical PMs im PIMpossible Team — alles was du in den ersten Wochen klären, aufsetzen und dokumentieren musst.</p>
     <div class="progress-bar-wrap"><div class="progress-bar" id="bar"></div></div>
@@ -312,74 +90,57 @@
       <span class="pct" id="pct">0%</span>
     </div>
   </header>
-
   <div id="phases"></div>
-
   <div class="confetti-msg" id="done-msg">
     <h2>🎉 Onboarding abgeschlossen!</h2>
     <p>Alle Punkte erledigt. Du bist ready, als Technical PM durchzustarten.</p>
-    <button class="reset-btn" onclick="resetAll()">Zurücksetzen</button>
   </div>
-
-  <button class="reset-btn" onclick="resetAll()" style="display:block">↺ Alles zurücksetzen</button>
-
+  <div class="bottom-bar">
+    <button class="export-btn pdf" onclick="exportPDF()">↓ PDF</button>
+    <button class="export-btn" onclick="exportExcel()">↓ Excel</button>
+    <button class="export-btn csv" onclick="exportCSV()">↓ CSV</button>
+    <button class="reset-btn" onclick="resetAll()">↺ Zurücksetzen</button>
+  </div>
 </div>
-
 <script>
 const data = [
-  {
-    phase: "01", title: "Zugänge & Systeme",
-    items: [
-      { label: "PIM-System Zugang einrichten", desc: "Login, Rolle, Berechtigungen klären — welche Mandanten, Sprachen?", badge: "pm" },
-      { label: "MS-Teams Zugang", desc: "MS Teams Channels aussuchen und hinzufügen", badge: "pm" },
-      { label: "Jira / Ticket-System und Boards", desc: "Jira, Confluence. PIMpossible Board", badge: "pm" },
-      { label: "Confluence / Dokumentation", desc: "Wo lebt das Wissen? Seiten bookmarken, Spaces erkunden.", badge: "pm" },
-      { label: "Test-Umgebung", desc: "Zugang zu nicht-produktiven Umgebungen sicherstellen", badge: "tech" },
-    ]
-  },
-  {
-    phase: "02", title: "Systemarchitektur verstehen",
-    items: [
-      { label: "Systemlandschaft aufnehmen", desc: "Welche Systeme sprechen mit dem PIM? ERP, Webshop, DAM, Marketplace?", badge: "tech" },
-      { label: "Datenfluss Process Chart", desc: "Gibt es eine aktuelle Übersicht der Schnittstellen & Datenflüsse?", badge: "tech" },
-      { label: "Datenmodell verstehen", desc: "Attribute, Produkthierarchien, Kategorien, Variantenmodell", badge: "tech" },
-      { label: "Export-Kanäle dokumentieren", desc: "Wo werden Daten exportiert? Shop, Marktplätze, ERP?", badge: "tech" },
-      { label: "Import-Quellen dokumentieren", desc: "Wer liefert Daten ins PIM? Lieferanten, ERP, SFTP Files, manuell?", badge: "tech" },
-    ]
-  },
-  {
-    phase: "03", title: "Prozesse & Workflows",
-    items: [
-      { label: "Pflegeprozess für Produktdaten", desc: "Wer pflegt was? Content Team, Automatisierte Prozesse?", badge: "pm" },
-      { label: "Release-Prozess kennenlernen", desc: "Wie kommen Änderungen ins PIM? Deployment-Zyklus, Change Freeze?", badge: "pm" },
-      { label: "Qualitätssicherung (DQM)", desc: "Gibt es Validierungsregeln, Completeness Scores, Data Quality Reports?", badge: "tech" },
-      { label: "Approval Workflows", desc: "Wer muss neue Attribute, Strukturen oder Änderungen freigeben?", badge: "stakeholder" },
-      { label: "Eskalationswege kennen", desc: "Bei Systemausfällen, Datenfehlern: Wen kontaktieren ich?", badge: "pm" },
-    ]
-  },
-  {
-    phase: "04", title: "Stakeholder & Team",
-    items: [
-      { label: "Stakeholder-Map erstellen", desc: "IT, Business, externe Partner — wer ist involviert?", badge: "stakeholder" },
-      { label: "Key Contacts pro System", desc: "Technischer Ansprechpartner für PIM, ERP, Shop, DAM", badge: "stakeholder" },
-      { label: "Regeltermine kennen", desc: "Welche Mettings: Jour-Fixe, Plannings, Refinements gibt es?", badge: "pm" },
-      { label: "Schnittstellen zu anderen PMs", desc: "Wer entscheidet was?", badge: "stakeholder" },
-    ]
-  },
-  {
-    phase: "05", title: "Erste eigene Deliverables",
-    items: [
-      { label: "Systemdoku aktualisieren / anlegen", desc: "Fehlende Dokumentation identifizieren und erste Version erstellen oder Bestehende erweitern", badge: "pm" },
-      { label: "Attribut-Mapping dokumentieren", desc: "Quellfeld → PIM-Feld → Ausgabefeld für mind. einen Produkttyp", badge: "tech" },
-      { label: "Backlog-Grooming Erstteilnahme", desc: "Tickets verstehen, Fragen stellen, erste eigene Tickets schreiben", badge: "pm" },
-      { label: "30-60-90 Tage Plan aufsetzen", desc: "Eigene Ziele definieren und mit Führungskraft/People Coach abstimmen", badge: "pm" },
-    ]
-  }
+  { phase: "01", title: "Zugänge & Systeme", items: [
+    { label: "PIM-System Zugang einrichten", desc: "Login, Rolle, Berechtigungen klären — welche Mandanten, Sprachen?", badge: "pm" },
+    { label: "MS-Teams Zugang", desc: "MS Teams Channels aussuchen und hinzufügen", badge: "pm" },
+    { label: "Jira / Ticket-System und Boards", desc: "Jira, Confluence. PIMpossible Board", badge: "pm" },
+    { label: "Confluence / Dokumentation", desc: "Wo lebt das Wissen? Seiten bookmarken, Spaces erkunden.", badge: "pm" },
+    { label: "Test-Umgebung", desc: "Zugang zu nicht-produktiven Umgebungen sicherstellen", badge: "tech" },
+  ]},
+  { phase: "02", title: "Systemarchitektur verstehen", items: [
+    { label: "Systemlandschaft aufnehmen", desc: "Welche Systeme sprechen mit dem PIM? ERP, Webshop, DAM, Marketplace?", badge: "tech" },
+    { label: "Datenfluss Process Chart", desc: "Gibt es eine aktuelle Übersicht der Schnittstellen & Datenflüsse?", badge: "tech" },
+    { label: "Datenmodell verstehen", desc: "Attribute, Produkthierarchien, Kategorien, Variantenmodell", badge: "tech" },
+    { label: "Export-Kanäle dokumentieren", desc: "Wo werden Daten exportiert? Shop, Marktplätze, ERP?", badge: "tech" },
+    { label: "Import-Quellen dokumentieren", desc: "Wer liefert Daten ins PIM? Lieferanten, ERP, SFTP Files, manuell?", badge: "tech" },
+  ]},
+  { phase: "03", title: "Prozesse & Workflows", items: [
+    { label: "Pflegeprozess für Produktdaten", desc: "Wer pflegt was? Content Team, Automatisierte Prozesse?", badge: "pm" },
+    { label: "Release-Prozess kennenlernen", desc: "Wie kommen Änderungen ins PIM? Deployment-Zyklus, Change Freeze?", badge: "pm" },
+    { label: "Qualitätssicherung (DQM)", desc: "Gibt es Validierungsregeln, Completeness Scores, Data Quality Reports?", badge: "tech" },
+    { label: "Approval Workflows", desc: "Wer muss neue Attribute, Strukturen oder Änderungen freigeben?", badge: "stakeholder" },
+    { label: "Eskalationswege kennen", desc: "Bei Systemausfällen, Datenfehlern: Wen kontaktieren ich?", badge: "pm" },
+  ]},
+  { phase: "04", title: "Stakeholder & Team", items: [
+    { label: "Stakeholder-Map erstellen", desc: "IT, Business, externe Partner — wer ist involviert?", badge: "stakeholder" },
+    { label: "Key Contacts pro System", desc: "Technischer Ansprechpartner für PIM, ERP, Shop, DAM", badge: "stakeholder" },
+    { label: "Regeltermine kennen", desc: "Welche Meetings: Jour-Fixe, Plannings, Refinements gibt es?", badge: "pm" },
+    { label: "Schnittstellen zu anderen PMs", desc: "Wer entscheidet was?", badge: "stakeholder" },
+  ]},
+  { phase: "05", title: "Erste eigene Deliverables", items: [
+    { label: "Systemdoku aktualisieren / anlegen", desc: "Fehlende Dokumentation identifizieren und erste Version erstellen oder Bestehende erweitern", badge: "pm" },
+    { label: "Attribut-Mapping dokumentieren", desc: "Quellfeld → PIM-Feld → Ausgabefeld für mind. einen Produkttyp", badge: "tech" },
+    { label: "Backlog-Grooming Erstteilnahme", desc: "Tickets verstehen, Fragen stellen, erste eigene Tickets schreiben", badge: "pm" },
+    { label: "30-60-90 Tage Plan aufsetzen", desc: "Eigene Ziele definieren und mit Führungskraft/People Coach abstimmen", badge: "pm" },
+  ]}
 ];
 
 const saved = JSON.parse(localStorage.getItem('pim-checklist') || '{}');
 let total = 0, done = 0;
-
 function save() { localStorage.setItem('pim-checklist', JSON.stringify(saved)); }
 
 function updateProgress() {
@@ -389,15 +150,10 @@ function updateProgress() {
   document.getElementById('done-count').textContent = `${done} von ${total} erledigt`;
   document.getElementById('pct').textContent = pct + '%';
   document.getElementById('done-msg').style.display = pct === 100 ? 'block' : 'none';
-
-  // Update phase counts
   data.forEach((phase, pi) => {
     const phaseDone = phase.items.filter((_, ii) => saved[`${pi}-${ii}`]).length;
     const el = document.getElementById(`phase-count-${pi}`);
-    if (el) {
-      el.textContent = `${phaseDone}/${phase.items.length}`;
-      el.classList.toggle('done', phaseDone === phase.items.length);
-    }
+    if (el) { el.textContent = `${phaseDone}/${phase.items.length}`; el.classList.toggle('done', phaseDone === phase.items.length); }
   });
 }
 
@@ -407,63 +163,129 @@ function toggleItem(el, key) {
   el.classList.add('pop');
   setTimeout(() => el.classList.remove('pop'), 300);
   el.querySelector('.checkbox').textContent = saved[key] ? '✓' : '';
-  save();
-  updateProgress();
+  save(); updateProgress();
 }
 
 function resetAll() {
   Object.keys(saved).forEach(k => delete saved[k]);
   save();
-  document.querySelectorAll('.item').forEach(el => {
-    el.classList.remove('checked');
-    el.querySelector('.checkbox').textContent = '';
-  });
+  document.querySelectorAll('.item').forEach(el => { el.classList.remove('checked'); el.querySelector('.checkbox').textContent = ''; });
   updateProgress();
 }
 
-const container = document.getElementById('phases');
+function getRows() {
+  const rows = [];
+  data.forEach((phase, pi) => {
+    phase.items.forEach((item, ii) => {
+      const key = `${pi}-${ii}`;
+      rows.push({ Phase: phase.title, Aufgabe: item.label, Beschreibung: item.desc, Typ: item.badge === 'pm' ? 'PM' : item.badge === 'tech' ? 'Tech' : 'Stakeholder', Status: saved[key] ? 'Erledigt' : 'Offen' });
+    });
+  });
+  return rows;
+}
 
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const doneCount = Object.values(saved).filter(Boolean).length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+  const today = new Date().toLocaleDateString('de-DE');
+
+  doc.setFillColor(14, 15, 17); doc.rect(0, 0, 210, 297, 'F');
+  doc.setTextColor(0, 229, 160); doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+  doc.text('PIM Onboarding Checklist', 20, 24);
+  doc.setTextColor(107, 114, 128); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(`Exportiert am ${today}  ·  ${doneCount} von ${total} erledigt (${pct}%)`, 20, 32);
+  doc.setFillColor(22, 24, 28); doc.roundedRect(20, 37, 170, 4, 2, 2, 'F');
+  if (pct > 0) { doc.setFillColor(0, 229, 160); doc.roundedRect(20, 37, 170 * pct / 100, 4, 2, 2, 'F'); }
+
+  let y = 52;
+  data.forEach((phase, pi) => {
+    if (y > 270) { doc.addPage(); doc.setFillColor(14,15,17); doc.rect(0,0,210,297,'F'); y = 20; }
+    doc.setFillColor(22, 24, 28); doc.roundedRect(20, y - 4, 170, 9, 2, 2, 'F');
+    doc.setTextColor(255, 107, 53); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+    doc.text(phase.phase, 24, y + 2);
+    doc.setTextColor(232, 234, 237); doc.text(phase.title.toUpperCase(), 34, y + 2);
+    const phaseDone = phase.items.filter((_, ii) => saved[`${pi}-${ii}`]).length;
+    doc.setTextColor(107, 114, 128); doc.text(`${phaseDone}/${phase.items.length}`, 178, y + 2, { align: 'right' });
+    y += 13;
+    phase.items.forEach((item, ii) => {
+      if (y > 276) { doc.addPage(); doc.setFillColor(14,15,17); doc.rect(0,0,210,297,'F'); y = 20; }
+      const key = `${pi}-${ii}`;
+      const checked = !!saved[key];
+      doc.setFillColor(checked ? 13 : 22, checked ? 42 : 24, checked ? 31 : 28);
+      doc.roundedRect(20, y - 3, 170, 10, 1, 1, 'F');
+      if (checked) {
+        doc.setFillColor(0, 229, 160); doc.roundedRect(24, y - 1, 5, 5, 1, 1, 'F');
+        doc.setTextColor(14, 15, 17); doc.setFontSize(7); doc.text('v', 25.8, y + 3);
+      } else {
+        doc.setDrawColor(42, 45, 52); doc.setLineWidth(0.4); doc.roundedRect(24, y - 1, 5, 5, 1, 1, 'S');
+      }
+      doc.setFontSize(9); doc.setFont('helvetica', checked ? 'normal' : 'bold');
+      doc.setTextColor(checked ? 107 : 232, checked ? 114 : 234, checked ? 128 : 237);
+      const label = item.label.length > 55 ? item.label.substring(0, 52) + '...' : item.label;
+      doc.text(label, 33, y + 3);
+      doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(checked ? 0 : 107, checked ? 229 : 114, checked ? 160 : 128);
+      doc.text(checked ? 'ERLEDIGT' : 'OFFEN', 178, y + 3, { align: 'right' });
+      y += 11;
+    });
+    y += 6;
+  });
+  doc.save('pim-onboarding-checklist.pdf');
+}
+
+function exportExcel() {
+  const rows = getRows();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{ wch: 28 }, { wch: 40 }, { wch: 55 }, { wch: 14 }, { wch: 12 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Onboarding');
+  const doneCount = Object.values(saved).filter(Boolean).length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+  const ws2 = XLSX.utils.json_to_sheet([
+    { Metrik: 'Gesamt Aufgaben', Wert: total },
+    { Metrik: 'Erledigt', Wert: doneCount },
+    { Metrik: 'Offen', Wert: total - doneCount },
+    { Metrik: 'Fortschritt', Wert: `${pct}%` },
+    { Metrik: 'Exportiert am', Wert: new Date().toLocaleDateString('de-DE') },
+  ]);
+  ws2['!cols'] = [{ wch: 20 }, { wch: 20 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Zusammenfassung');
+  XLSX.writeFile(wb, 'pim-onboarding-checklist.xlsx');
+}
+
+function exportCSV() {
+  const rows = getRows();
+  const headers = Object.keys(rows[0]);
+  const escape = v => `"${String(v).replace(/"/g, '""')}"`;
+  const csv = [headers.map(escape).join(','), ...rows.map(r => headers.map(h => escape(r[h])).join(','))].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'pim-onboarding-checklist.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Render
+const container = document.getElementById('phases');
 data.forEach((phase, pi) => {
   total += phase.items.length;
-  const phaseEl = document.createElement('div');
-  phaseEl.className = 'phase';
-
-  const header = document.createElement('div');
-  header.className = 'phase-header';
-  header.innerHTML = `
-    <span class="phase-number">${phase.phase}</span>
-    <span class="phase-title">${phase.title}</span>
-    <span class="phase-count" id="phase-count-${pi}">0/${phase.items.length}</span>
-    <span class="phase-toggle">▾</span>
-  `;
+  const phaseEl = document.createElement('div'); phaseEl.className = 'phase';
+  const header = document.createElement('div'); header.className = 'phase-header';
+  header.innerHTML = `<span class="phase-number">${phase.phase}</span><span class="phase-title">${phase.title}</span><span class="phase-count" id="phase-count-${pi}">0/${phase.items.length}</span><span class="phase-toggle">▾</span>`;
   header.addEventListener('click', () => phaseEl.classList.toggle('collapsed'));
-
-  const itemsEl = document.createElement('div');
-  itemsEl.className = 'items';
-
+  const itemsEl = document.createElement('div'); itemsEl.className = 'items';
   phase.items.forEach((item, ii) => {
     const key = `${pi}-${ii}`;
     const itemEl = document.createElement('div');
     itemEl.className = 'item' + (saved[key] ? ' checked' : '');
-    itemEl.innerHTML = `
-      <div class="checkbox">${saved[key] ? '✓' : ''}</div>
-      <div class="item-text">
-        <div class="item-label">${item.label}</div>
-        <div class="item-desc">${item.desc}</div>
-      </div>
-      <span class="badge ${item.badge}">${item.badge === 'pm' ? 'PM' : item.badge === 'tech' ? 'Tech' : 'Stakeholder'}</span>
-    `;
+    itemEl.innerHTML = `<div class="checkbox">${saved[key] ? '✓' : ''}</div><div class="item-text"><div class="item-label">${item.label}</div><div class="item-desc">${item.desc}</div></div><span class="badge ${item.badge}">${item.badge === 'pm' ? 'PM' : item.badge === 'tech' ? 'Tech' : 'Stakeholder'}</span>`;
     itemEl.addEventListener('click', () => toggleItem(itemEl, key));
     itemsEl.appendChild(itemEl);
   });
-
-  phaseEl.appendChild(header);
-  phaseEl.appendChild(itemsEl);
-  container.appendChild(phaseEl);
+  phaseEl.appendChild(header); phaseEl.appendChild(itemsEl); container.appendChild(phaseEl);
 });
-
 updateProgress();
 </script>
 </body>
 </html>
-
