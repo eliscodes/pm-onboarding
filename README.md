@@ -85,4 +85,4 @@ Alle Exporte laufen clientseitig über CDN-Libraries – kein Backend, kein Buil
 
 ## Lizenz
 
-© 2026 – Alle Rechte vorbehalten. Dieses Tool ist ausschließlich für den internen und privaten Gebrauch bestimmt. Weitergabe, Veröffentlichung oder Nutzung ist ohne ausdrückliche Genehmigung nicht gestattet.
+© 2026 MIT
