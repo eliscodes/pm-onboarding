@@ -3,14 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'none';
-  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src https://fonts.gstatic.com;
-  connect-src 'none';
-  img-src 'self' data:;
-">
 <title>PIM Onboarding Checklist</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
@@ -322,7 +314,11 @@ function exportExcel() {
   ]);
   ws2['!cols'] = [{ wch: 20 }, { wch: 20 }];
   XLSX.utils.book_append_sheet(wb, ws2, 'Zusammenfassung');
-  XLSX.writeFile(wb, 'pim-onboarding-checklist.xlsx');
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'pim-onboarding-checklist.xlsx'; a.click();
+  URL.revokeObjectURL(url);
 }
 
 function exportCSV() {
