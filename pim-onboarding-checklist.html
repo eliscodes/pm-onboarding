@@ -256,8 +256,8 @@
     <span id="search-term"></span>
   </div>
   <div class="bottom-bar">
-    <button class="export-btn template" onclick="openTemplateModal()" title="Aktuelle Checklist als Template speichern">💾 Template</button>
-    <button class="export-btn" onclick="openLoadModal()" title="Aus gespeichertem Template laden">📂 Laden</button>
+    <button class="export-btn" onclick="createNewChecklist()">Checkliste speichern</button>
+    <button class="export-btn" onclick="switchChecklist()">Checkliste wechseln</button>
     <button class="export-btn pdf" onclick="exportPDF()">↓ PDF</button>
     <button class="export-btn" onclick="exportExcel()">↓ Excel</button>
     <button class="export-btn csv" onclick="exportCSV()">↓ CSV</button>
@@ -336,6 +336,40 @@ function resetAll() {
     document.querySelectorAll('.item').forEach(el => { el.classList.remove('checked'); el.querySelector('.checkbox').textContent = ''; });
     updateProgress();
   }
+}
+
+function createNewChecklist() {
+  const name = prompt('Name der neuen Checklist (z.B. "PM Sarah"):');
+  if (!name) return;
+  
+  const checklists = JSON.parse(localStorage.getItem('pim-checklists') || '{}');
+  checklists[name] = {
+    data: JSON.parse(JSON.stringify(data)),
+    saved: JSON.parse(JSON.stringify(saved))
+  };
+  localStorage.setItem('pim-checklists', JSON.stringify(checklists));
+  alert(`✅ Checklist "${name}" gespeichert!`);
+}
+
+function switchChecklist() {
+  const checklists = JSON.parse(localStorage.getItem('pim-checklists') || '{}');
+  const names = Object.keys(checklists);
+  
+  if (names.length === 0) {
+    alert('Keine gespeicherten Checklists vorhanden');
+    return;
+  }
+  
+  const name = prompt(`Wähle eine Checklist:\n\n${names.join('\n')}`);
+  if (!name || !checklists[name]) return;
+  
+  const checklist = checklists[name];
+  data.length = 0;
+  data.push(...checklist.data);
+  Object.assign(saved, checklist.saved);
+  save();
+  
+  location.reload();
 }
 
 function highlightText(text, query) {
