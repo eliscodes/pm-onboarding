@@ -34,7 +34,7 @@
   html.light .item:hover { background: #f0f2f5; border-color: #c8cdd6; }
   html.light .item.checked { background: var(--done-bg); border-color: #b0dfc8; }
 
-  /* ���─ TOGGLE BUTTON ── */
+  /* ── TOGGLE BUTTON ── */
   .theme-toggle {
     position: fixed;
     top: 20px;
@@ -114,6 +114,23 @@
     text-align: right;
   }
   .search-results-info.active { color: var(--accent); }
+
+  /* ── TEMPLATE MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; animation: fadeIn 0.2s ease; }
+  .modal-overlay.active { display: flex; align-items: center; justify-content: center; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 32px; max-width: 500px; width: 90%; animation: slideUp 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal h2 { font-size: 20px; margin-bottom: 12px; color: var(--text); }
+  .modal p { color: var(--muted); margin-bottom: 24px; font-size: 14px; line-height: 1.6; }
+  .modal-input { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; margin-bottom: 24px; }
+  .modal-input:focus { outline: none; border-color: var(--accent); }
+  .modal-buttons { display: flex; gap: 12px; }
+  .modal-btn { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+  .modal-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .modal-btn.primary:hover { opacity: 0.9; }
+  .modal-btn.secondary { color: var(--muted); background: transparent; }
+  .modal-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   
   .phase { margin-bottom: 40px; animation: fadeUp 0.5s ease both; }
   .phase:nth-child(1) { animation-delay: 0.1s; }
@@ -163,6 +180,7 @@
   .export-btn:hover { border-color: var(--accent); color: var(--accent); }
   .export-btn.pdf:hover { border-color: #f55; color: #f55; }
   .export-btn.csv:hover { border-color: #7ba7f5; color: #7ba7f5; }
+  .export-btn.template:hover { border-color: #c570e8; color: #c570e8; }
   .reset-btn { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: all 0.2s; margin-left: auto; }
   .reset-btn:hover { border-color: var(--accent2); color: var(--accent2); }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -178,10 +196,35 @@
   <div class="toggle-track"><div class="toggle-thumb"></div></div>
 </div>
 
+<!-- ── TEMPLATE MODAL ── -->
+<div class="modal-overlay" id="template-modal">
+  <div class="modal">
+    <h2>📋 Template speichern</h2>
+    <p>Speichere diese Checklist als Template für zukünftige Onboardings.</p>
+    <input type="text" class="modal-input" id="template-name" placeholder="z.B. PIM Team v1.0" autocomplete="off">
+    <div class="modal-buttons">
+      <button class="modal-btn secondary" onclick="closeTemplateModal()">Abbrechen</button>
+      <button class="modal-btn primary" onclick="saveTemplate()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOAD TEMPLATE MODAL ── -->
+<div class="modal-overlay" id="load-modal">
+  <div class="modal">
+    <h2>📂 Template laden</h2>
+    <p>Wähle ein Template, um eine neue Checklist zu starten:</p>
+    <div id="template-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 24px;"></div>
+    <div class="modal-buttons">
+      <button class="modal-btn secondary" onclick="closeLoadModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 <div class="noise"></div>
 <div class="container">
   <header>
-    <div class="tag">v1.2 · PIM/MDM</div>
+    <div class="tag">v1.3 · PIM/MDM</div>
     <h1>Onboarding<br><span>Checklist</span></h1>
     <p class="subtitle">Für Technical PMs im PIM Team — alles was du in den ersten Wochen klären, aufsetzen und dokumentieren musst.</p>
     <div class="progress-bar-wrap"><div class="progress-bar" id="bar"></div></div>
@@ -197,7 +240,7 @@
       type="text" 
       class="search-input" 
       id="search-input" 
-      placeholder="Aufgaben durchsuchen..." 
+      placeholder="🔍 Aufgaben durchsuchen..." 
       autocomplete="off"
     >
     <div class="search-results-info" id="search-info"></div>
@@ -213,6 +256,8 @@
     <span id="search-term"></span>
   </div>
   <div class="bottom-bar">
+    <button class="export-btn template" onclick="openTemplateModal()" title="Aktuelle Checklist als Template speichern">💾 Template</button>
+    <button class="export-btn" onclick="openLoadModal()" title="Aus gespeichertem Template laden">📂 Laden</button>
     <button class="export-btn pdf" onclick="exportPDF()">↓ PDF</button>
     <button class="export-btn" onclick="exportExcel()">↓ Excel</button>
     <button class="export-btn csv" onclick="exportCSV()">↓ CSV</button>
@@ -285,10 +330,12 @@ function toggleItem(el, key) {
 }
 
 function resetAll() {
-  Object.keys(saved).forEach(k => delete saved[k]);
-  save();
-  document.querySelectorAll('.item').forEach(el => { el.classList.remove('checked'); el.querySelector('.checkbox').textContent = ''; });
-  updateProgress();
+  if (confirm('Alle Häkchen entfernen?')) {
+    Object.keys(saved).forEach(k => delete saved[k]);
+    save();
+    document.querySelectorAll('.item').forEach(el => { el.classList.remove('checked'); el.querySelector('.checkbox').textContent = ''; });
+    updateProgress();
+  }
 }
 
 function highlightText(text, query) {
@@ -316,7 +363,6 @@ function performSearch(query) {
         phaseHasMatches = true;
         totalMatches++;
         
-        // Update highlighting
         if (currentSearch) {
           itemEl.querySelector('.item-label').innerHTML = highlightText(data[pi].items[ii].label, currentSearch);
           itemEl.querySelector('.item-desc').innerHTML = highlightText(data[pi].items[ii].desc, currentSearch);
@@ -332,7 +378,6 @@ function performSearch(query) {
     phaseEl.classList.toggle('hidden', !phaseHasMatches && currentSearch !== '');
   });
 
-  // Update search info
   const searchInfo = document.getElementById('search-info');
   if (currentSearch) {
     searchInfo.textContent = totalMatches === 0 
@@ -344,13 +389,83 @@ function performSearch(query) {
     searchInfo.classList.remove('active');
   }
 
-  // Show/hide no results message
   const noResultsMsg = document.getElementById('no-results-msg');
   if (currentSearch && totalMatches === 0) {
     noResultsMsg.style.display = 'block';
     document.getElementById('search-term').textContent = `Suchbegriff: "${query}"`;
   } else {
     noResultsMsg.style.display = 'none';
+  }
+}
+
+// ── TEMPLATE FUNCTIONS ──
+function openTemplateModal() {
+  document.getElementById('template-modal').classList.add('active');
+  document.getElementById('template-name').focus();
+}
+
+function closeTemplateModal() {
+  document.getElementById('template-modal').classList.remove('active');
+}
+
+function saveTemplate() {
+  const name = document.getElementById('template-name').value.trim();
+  if (!name) { alert('Bitte gib einen Namen ein'); return; }
+  
+  const templates = JSON.parse(localStorage.getItem('pim-templates') || '{}');
+  templates[name] = JSON.parse(JSON.stringify(data));
+  localStorage.setItem('pim-templates', JSON.stringify(templates));
+  
+  document.getElementById('template-name').value = '';
+  closeTemplateModal();
+  alert(`✅ Template "${name}" gespeichert!`);
+}
+
+function openLoadModal() {
+  const templates = JSON.parse(localStorage.getItem('pim-templates') || '{}');
+  const templateList = document.getElementById('template-list');
+  
+  if (Object.keys(templates).length === 0) {
+    templateList.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">Keine Templates vorhanden. Erstelle zuerst ein Template mit dem "Template" Button.</p>';
+    document.getElementById('load-modal').classList.add('active');
+    return;
+  }
+  
+  templateList.innerHTML = Object.keys(templates).map(name => `
+    <div style="padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-family: 'DM Mono', monospace; font-size: 13px;">${name}</span>
+      <div style="display: flex; gap: 6px;">
+        <button class="modal-btn secondary" style="padding: 6px 12px; margin: 0;" onclick="loadTemplate('${name}')">Laden</button>
+        <button class="modal-btn secondary" style="padding: 6px 12px; margin: 0; border-color: #f55; color: #f55;" onclick="deleteTemplate('${name}')">Löschen</button>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('load-modal').classList.add('active');
+}
+
+function closeLoadModal() {
+  document.getElementById('load-modal').classList.remove('active');
+}
+
+function loadTemplate(name) {
+  if (confirm(`Aktuelle Checklist überschreiben und Template "${name}" laden?`)) {
+    const templates = JSON.parse(localStorage.getItem('pim-templates') || '{}');
+    Object.assign(data, templates[name]);
+    
+    Object.keys(saved).forEach(k => delete saved[k]);
+    save();
+    
+    location.reload();
+  }
+}
+
+function deleteTemplate(name) {
+  if (confirm(`Template "${name}" wirklich löschen?`)) {
+    const templates = JSON.parse(localStorage.getItem('pim-templates') || '{}');
+    delete templates[name];
+    localStorage.setItem('pim-templates', JSON.stringify(templates));
+    openLoadModal();
   }
 }
 
@@ -472,6 +587,14 @@ data.forEach((phase, pi) => {
 // ── SEARCH FUNCTIONALITY ──
 const searchInput = document.getElementById('search-input');
 searchInput.addEventListener('input', (e) => performSearch(e.target.value));
+
+// ── CLOSE MODALS ON OVERLAY CLICK ──
+document.getElementById('template-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'template-modal') closeTemplateModal();
+});
+document.getElementById('load-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'load-modal') closeLoadModal();
+});
 
 // ── THEME TOGGLE LOGIC ──
 function toggleTheme() {
